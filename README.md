@@ -1,6 +1,6 @@
 # Manifesto for Typst
 
-**Manifesto** 📚 is the first HTML Typst documentation template for packages, built to be very easy to use. It is responsive and directly uses your `typst.toml` to get your package information.
+**Manifesto** 📚 is the first HTML Typst documentation template for packages, built to be very easy to use. It is written **100% in Typst, responsive** and directly uses your `typst.toml` to get automatically your package information.
 
 [Report a bug](https://github.com/l0uisgrange/manifesto/issues?new) — [Forum](https://github.com/l0uisgrange/manifesto/discussions/categories/q-a)
 
