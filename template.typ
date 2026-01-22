@@ -1,5 +1,4 @@
 #import "@preview/t4t:0.4.2": get
-#import "/docs/template/bone.typ" as bone
 #import "/docs/template/icons.typ": bug-icon, qa-icon
 
 #let detoml = toml
