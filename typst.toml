@@ -1,0 +1,13 @@
+[package]
+name = "manifesto"
+version = "0.1.0"
+compiler = "0.14.2"
+entrypoint = "template.typ"
+authors = ["Louis Grange <https://github.com/l0uisgrange>"]
+license = "MIT"
+description = "Create beautiful documentation static websites using Typst's native HTML export"
+repository = "https://github.com/l0uisgrange/manifesto"
+categories = ["layout", "visualization"]
+disciplines = ["design", "education"]
+keywords = ["documentation", "docs", "html", "website", "site", "static", "online"]
+exclude = [".github"]
