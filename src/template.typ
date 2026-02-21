@@ -2,8 +2,21 @@
 
 #let detoml = toml
 
+/// Documentation template generation function
+///
+/// - doc (document): documentation website content
+/// - title (str): html `<title>`
+/// - toml (toml): package configuration file, gives data to display
+/// - copyright (bool): display/hide Manifesto copyright
+/// - version (str): package version
+/// - notices (array): list of notices to display on the left
+/// - links (array): list of links to display on the left
+/// - description (str): package description
+/// - repository (str): link to package repository (e.g. GitHub, Gitlab, Codeberg)
+/// - universe (str): link to package page on Typst Universe
+/// - license (str): package license
+/// -> content
 #let template(doc, title: none, toml: none, copyright: true, version: none, notices: (), links: (), description: none, repository: none, universe: none, license: none) = [
-
     #let title = if toml != none { detoml(toml).package.name } else { title }
     #let version = if toml != none { detoml(toml).package.at("version", default: none) } else { version }
     #let universe = if toml != none { detoml(toml).package.at("name", default: none) } else { universe }
@@ -118,6 +131,11 @@
     ]
 ]
 
+/// Warning (orange) notice with attached icon
+///
+/// - content (content): notice content
+/// - title (str): notice title, defaults to "Warning"
+/// -> content
 #let warning(content, title: "Warning", ..params) = block(
     ..params,
     html.elem("div", attrs: (class: "px-3 py-2.5 rounded-md bg-orange-600/10"), {
@@ -135,6 +153,11 @@
     }),
 )
 
+/// Tip (green) notice with attached icon
+///
+/// - content (content): notice content
+/// - title (str): notice title, defaults to "Tip"
+/// -> content
 #let tip(content, title: "Tip", ..params) = block(
     ..params,
     html.elem("div", attrs: (class: "px-3 py-2.5 rounded-md bg-green-600/10"), {
@@ -152,7 +175,11 @@
     }),
 )
 
-
+/// Info (blue) notice with attached icon
+///
+/// - content (content): notice content
+/// - title (str): notice title, defaults to "Info"
+/// -> content
 #let info(content, title: "Info", ..params) = block(
     ..params,
     html.elem("div", attrs: (class: "px-3 py-2.5 rounded-md bg-blue-600/10"), {
@@ -184,6 +211,10 @@
     ))
 })
 
+/// Wrapper for `html.frame`, with background and border
+///
+/// - drawing (content): CeTZ canvas or any content
+/// -> content
 #let schema(drawing) = html.elem("div", attrs: (class: "mb-7  rounded-md border dark:border-zinc-800 overflow-hidden flex-col flex *:m-0 *:block *:w-full *:even:rounded-t-none"), {
     html.elem("div", attrs: (class: "p-7 bg-white rounded-md dark:invert dark:hue-rotate-180"))[
         #html.frame(drawing)
