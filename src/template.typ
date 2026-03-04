@@ -23,9 +23,11 @@
     #let license = if toml != none { detoml(toml).package.at("license", default: none) } else { license }
     #let repository = if toml != none { detoml(toml).package.at("repository", default: none) } else { repository }
     #let description = if toml != none { detoml(toml).package.at("description", default: none) } else { description }
+    #assert(description != none, message: "description must be set")
+    #assert(repository != none, message: "repository URL must be set")
     #html.html(lang: "en", class: "scroll-smooth")[
         #html.head[
-            #html.meta(charset: "UTF-8")
+            #html.meta(charset: "utf-8")
             #html.meta(name: "viewport", content: "width=device-width, initial-scale=1.0")
             #html.title[#context document.title]
             // Styling sources
@@ -182,31 +184,16 @@
     }),
 )
 
-/// Info (blue) notice with attached icon
-///
-/// - content (content): notice content
-/// - title (str): notice title, defaults to "Info"
-/// -> content
-#let schema(drawing, lang: "typst") = html.div(class: "mb-7  rounded-md border dark:border-zinc-800 overflow-hidden flex-col flex *:m-0 *:block *:w-full *:even:rounded-t-none", {
-    html.div(class: "p-7 bg-white rounded-t-md dark:invert dark:hue-rotate-180")[
-        #html.frame[
-            #eval(drawing.text, mode: "markup")
-        ]
-    ]
-    html.div(class: "*:rounded-t-none *:border-none border-t dark:border-zinc-800 *:border-none overflow-x-scroll", raw(
-        drawing.text.split("\n").slice(2).join("\n"),
-        block: true,
-        lang: lang,
-    ))
-})
-
 /// Wrapper for `html.frame`, with background and border
 ///
 /// - drawing (content): CeTZ canvas or any content
-/// - code (bool): displays code used to generate content
+/// - code (content): raw content (e.g. code) to display below the schema
 /// -> content
-#let schema(drawing) = html.div(class: "mb-7  rounded-md border dark:border-zinc-800 overflow-hidden flex-col flex *:m-0 *:block *:w-full *:even:rounded-t-none", {
-    html.div(class: "p-7 bg-white rounded-md dark:invert dark:hue-rotate-180")[
+#let schema(drawing, code: none, lang: "typst") = html.div(class: "mb-7 rounded-md border dark:border-zinc-800 overflow-hidden flex-col flex *:m-0 *:block *:w-full *:even:rounded-t-none", {
+    html.div(class: "p-7 bg-white rounded-md dark:invert dark:hue-rotate-180" + if code != none { "rounded-b-none" } else { "" })[
         #html.frame(drawing)
     ]
+    if code != none {
+        html.div(class: "*:rounded-t-none *:border-none border-t dark:border-zinc-800 *:border-none overflow-x-scroll", code)
+    }
 })
