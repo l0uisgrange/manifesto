@@ -13,9 +13,9 @@ You are free to check either [this example](https://bone.grangelouis.ch) from `b
 The template is very easy to use, and will transform your whole project into a stunning online documentation in just a second.
 
 ```typst
-#import "@preview/manifesto:0.1.0": template
+#import "@preview/manifesto:0.1.1": template
 
-#show: it => template(it, title: "MyPackage", toml: "PATH_TO/typst.toml")
+#show: it => template(it, title: "MyPackage", toml: toml("/typst.toml"))
 
 = My first title
 
@@ -28,12 +28,11 @@ The `template` function accepts a few parameters to customize the data displayed
 
 | Option | Default value | Description |
 | --- | --- | --- |
-| `title` (required) |  | The title of your package |
+| `name` (required) |  | The name of your package |
 | `toml` | `none` | The path to the `typst.toml` file |
 | `version` | `none` | Your package version |
 | `description` | `none` | Your package description |
 | `repository` | `none` | Your package repository URL (e.g. GitHub) |
-| `universe` | `none` | Your package name on Typst universe name |
 | `license` | `none` | Your package license |
 
 Note that giving the `toml` file is aready enough, and will fill in the other options.

@@ -1,11 +1,9 @@
-#import "icons.typ": bug-icon, qa-icon
-
-#let detoml = toml
+#import "icons.typ": bulb-icon, flame-icon, flare-icon, spider-icon
 
 /// Documentation template generation function
 ///
 /// - doc (document): documentation website content
-/// - title (str): html `<title>`
+/// - name (str): package name
 /// - toml (toml): package configuration file, gives data to display
 /// - copyright (bool): display/hide Manifesto copyright
 /// - version (str): package version
@@ -13,12 +11,12 @@
 /// - links (array): list of links to display on the left
 /// - description (str): package description
 /// - repository (str): link to package repository (e.g. GitHub, Gitlab, Codeberg)
-/// - universe (str): link to package page on Typst Universe
 /// - license (str): package license
+/// - font ("sans" | "serif"): website font
 /// -> content
 #let template(
     doc,
-    title: none,
+    name: none,
     toml: none,
     copyright: true,
     version: none,
@@ -28,14 +26,19 @@
     repository: none,
     universe: none,
     license: none,
+    disciplines: none,
+    font: "sans",
+    class: "",
     ..params,
 ) = context [
-    #let title = if toml != none { detoml(toml).package.name } else { title }
-    #let version = if toml != none { detoml(toml).package.at("version", default: none) } else { version }
-    #let universe = if toml != none { detoml(toml).package.at("name", default: none) } else { universe }
-    #let license = if toml != none { detoml(toml).package.at("license", default: none) } else { license }
-    #let repository = if toml != none { detoml(toml).package.at("repository", default: none) } else { repository }
-    #let description = if toml != none { detoml(toml).package.at("description", default: none) } else { description }
+    #let name = if toml != none { toml.package.name } else { name }
+    #let dfont = if font == "sans" { "Hanken Grotesk" } else { "Libertinus Serif" }
+    #let version = if toml != none { toml.package.at("version", default: none) } else { version }
+    #let universe = if toml != none { toml.package.at("name", default: none) } else { universe }
+    #let license = if toml != none { toml.package.at("license", default: none) } else { license }
+    #let repository = if toml != none { toml.package.at("repository", default: none) } else { repository }
+    #let description = if toml != none { toml.package.at("description", default: none) } else { description }
+    #let disciplines = if toml != none { toml.package.at("disciplines", default: none) } else { disciplines }
     #assert(description != none, message: "description must be set")
     #assert(repository != none, message: "repository URL must be set")
     #if (target() == "paged") { [This template is not meant for PDF, please switch to #underline(link("https://typst.app/docs/reference/html/")[HTML export]).] }
@@ -45,63 +48,79 @@
             #html.meta(name: "viewport", content: "width=device-width, initial-scale=1.0")
             #html.title[#context document.title]
             // Styling sources
-            #html.script(src: "https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,container-queries")
+            #html.script(src: "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4")
             #html.link(rel: "preconnect", href: "https://fonts.googleapis.com")
             #html.link(rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous")
-            #html.link(rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap")
+            #html.link(
+                rel: "stylesheet",
+                href: "https://fonts.googleapis.com/css2?family=" + dfont.replace(" ", "+") + ":ital,wght@0,400;0,600;0,800;1,400;1,600;1,800&display=swap",
+            )
         ]
-        #html.body(style: "font-family: 'Mona Sans', sans-serif", class: "bg-zinc-50 dark:bg-zinc-950")[
+        #let text-size = if font == "sans" { "text-base" } else { "text-lg" }
+        #let small-text-size = if font == "sans" { "text-[0.88rem]" } else { "text-base" }
+        #html.body(
+            style: "font-family: '" + dfont + "', serif",
+            class: if font == "sans" { "[&_.schema-notes]:text-sm " } + "[&_*]:border-mist-200 [&_:is(h1,h2,h3,h4)]:font-semibold [&_:is(h1,h2,h3,h4)]:scroll-mt-5 [&_h2]:text-3xl [&_h3]:text-2xl [&_h3]:mt-6 [&_h2:nth-of-type(n+2)]:mt-10 [&_h2]:mb-4
+            [&_h3]:mb-3 [&_h4]:mb-3 [&_h4]:text-xl [&_p]:mb-3 [&_:is(ol,ul)]:ps-9 [&_ol_li::marker]:text-mist-500 [&_:is(ol,ul)]:space-y-3 [&_ol]:list-decimal [&_ul]:list-disc antialiased [&_a]:underline [&_a]:underline-offset-2 [&_a]:font-semibold text-mist-800
+            dark:text-mist-300 [&_strong]:text-black [&_strong]:font-semibold [&_:is(strong,a)]:dark:text-white! dark:text-white bg-mist-50 dark:bg-mist-950 [&_*]:dark:border-mist-800
+            [&_td]:py-1.5 [&_td]:border-b [&_td]:px-2 [&_td]:py-1 [&_td:first-child]:pl-0 [&_td:last-child]:pr-0 [&_tr:last-child_td]:border-none [&_tr:first-child_td]:pt-0 [&_tr:last-child_td]:pb-0"
+                + class,
+        )[
             // Configuration
             #set heading(numbering: none, ..params.at("heading", default: (:)))
             // Raw blocks styling
             #show raw.where(block: false): it => {
-                html.span(class: "border-t px-1 py-0.5 border-none rounded dark:bg-zinc-800 bg-zinc-200/60 text-xs *:not-prose not-prose font-mono", it)
+                html.span(class: "border-t px-1 py-0.5 border-none rounded dark:bg-mist-800 bg-mist-200/60 text-xs font-mono", it)
             }
             #show raw.where(block: true): it => {
-                html.div(class: "p-4 border bg-zinc-100/30 dark:bg-zinc-900/20 dark:border-zinc-800 not-prose text-[.85rem] rounded-md", it)
+                html.div(class: "mb-4 p-4 border bg-mist-100/30 dark:bg-mist-900/20 dark:border-mist-800 text-[.85rem] rounded-md", it)
             }
             // Article
-            #html.main(class: "max-w-[95rem] mx-auto grid md:grid-cols-[max-content_auto_max-content] relative gap-10 p-5 !antialised")[
+            #html.main(class: "max-w-[95rem] mx-auto grid lg:grid-cols-[max-content_auto_max-content] relative gap-8 p-5")[
                 // Navigation
-                #html.div(class: "order-1 md:w-60 prose overflow-visible")[
-                    #html.div(class: "sticky top-5")[
-                        #html.div(
-                            class: "dark:prose-invert prose-zinc dark:text-white prose-li:first:mt-0 prose-ol:p-0 prose-a:underline-offset-2 prose-li:p-0 prose-ol:m-0",
-                        )[
-                            #html.h1(
-                                class: if version != none { "rounded-bl-none " } else { "" }
-                                    + "capitalize bg-zinc-800 mb-0 text-white max-w-max rounded-md px-2 py-0.5 text-3xl font-medium mb-0",
-                                title,
-                            )
-                            #if version != none {
-                                html.div(class: "text-xs py-0.5 px-2 max-w-max rounded-md rounded-t-none bg-zinc-700 mb-8 text-white")[v#version]
-                            }
-                            #description
-                            #let provider = if "github" in repository { "GitHub" } else if "gitlab" in repository { "Gitlab" } else { "Source" }
-                            #table(
-                                columns: 2,
-                                if repository != none { [Repository] }, link(repository, provider),
-                                [Typst Universe], link("https://typst.app/universe/package/" + universe, title),
-                                [License], [#license],
-                                [Last update], [#datetime.today().display()],
-                            )
-                            #html.div(class: "grid grid-cols-2 lg:grid-cols-1 mt-8")[
-                                #if "qa" in notices [
-                                    #html.div[
-                                        #qa-icon
-                                        #html.div(class: "prose-sm mb-6 mt-2.5")[
-                                            Got a question? \
-                                            Ask it on the #link(notices.qa)[community forum].
-                                        ]
+                #html.div(class: "order-1 md:w-64 overflow-visible")[
+                    #html.div(class: "sticky top-5 " + text-size + " [&_table]:my-6 [&_table]:w-full dark:text-white [&_table]:" + small-text-size)[
+                        #html.h1(
+                            class: if version != none { "rounded-bl-none " } else { "" }
+                                + "capitalize bg-mist-900 mb-0 text-white max-w-max rounded-md px-2 py-0.5 text-3xl font-semibold",
+                            name,
+                        )
+                        #if version != none {
+                            html.div(class: small-text-size + " px-2 max-w-max rounded-md rounded-t-none bg-mist-800 mb-8 text-white")[v#version]
+                        }
+                        #description
+                        #if disciplines != none and disciplines.len() > 0 {
+                            html.div(class: "flex flex-wrap gap-1.5 mt-4 mb-2")[
+                                #for i in disciplines {
+                                    html.span(class: small-text-size + " bg-mist-200/50 dark:bg-mist-800 rounded-full px-2.5", i)
+                                }
+                            ]
+                        }
+                        #let provider = if "github" in repository { "GitHub" } else if "gitlab" in repository { "Gitlab" } else { "Source" }
+                        #table(
+                            columns: 2,
+                            if repository != none { [Repository] }, html.a(href: repository, target: "_blank", provider),
+                            ..if license != none { ([License], [#license]) },
+                            [Typst Universe], html.a(href: "https://typst.app/universe/package/" + name, target: "_blank", name),
+                            ..if version != none { ([Version], version) },
+                            [Last update], [#datetime.today().display("[day padding:none] [month repr:short] [year]")],
+                        )
+                        #html.div(class: "grid grid-cols-2 *:flex *:items-start gap-x-3 gap-y-5 *:gap-2 [&_p]:m-0! text-mist-800 dark:text-mist-200 lg:grid-cols-1 mt-8")[
+                            #if "qa" in notices [
+                                #html.div[
+                                    #flame-icon
+                                    #html.div(class: small-text-size)[
+                                        Got a question? \
+                                        Ask it on the #link(notices.qa)[community forum].
                                     ]
                                 ]
-                                #if "bug" in notices [
-                                    #html.div[
-                                        #bug-icon
-                                        #html.div(class: "prose-sm mt-2")[
-                                            Experienced a bug? \
-                                            Please #link(notices.bug)[report] it.
-                                        ]
+                            ]
+                            #if "bug" in notices [
+                                #html.div[
+                                    #spider-icon
+                                    #html.div(class: small-text-size)[
+                                        Experienced a bug? \
+                                        Please #link(notices.bug)[report] it.
                                     ]
                                 ]
                             ]
@@ -109,26 +128,20 @@
                     ]
                 ]
                 #html.article(
-                    class: "order-3 md:order-2 flex-auto !max-w-4xl prose dark:prose-invert overflow-hidden prose-zinc prose-a:underline-offset-2 prose-td:align-middle prose-headings:scroll-my-7 prose-headings:font-medium prose-strong:font-medium",
+                    class: "order-3 md:order-2 " + text-size + " flex-auto overflow-hidden",
                     doc,
                 )
-                #html.div(class: "order-2 md:order-3 w-60 flex-none prose overflow-visible")[
-                    #html.div(class: "sticky top-5")[
-                        #html.div(class: "dark:prose-invert prose-zinc dark:text-white prose-li:first:mt-0 prose-ol:p-0 prose-a:underline-offset-2 prose-li:p-0 prose-ol:m-0")[
-                            #html.div(
-                                class: "prose-a:text-current *:*:*:mb-0.5 prose-a:font-normal prose-a:decoration-0 mb-12",
-                                outline(depth: 1, title: none),
-                            )
-                        ]
-                    ]
+                #html.div(class: "order-2 " + text-size + "! md:order-3 md:w-64 flex-none overflow-visible")[
+                    #html.div(
+                        class: "sticky top-5 dark:text-white mb-12 *:space-y-0 [&_ol]:p-0 [&_li]:m-0 [&_a]:font-normal! [&_a]:text-current! [&_a]:hover:text-black! [&_a]:dark:hover:text-white! [&_a]:no-underline!",
+                        outline(depth: 1, title: none),
+                    )
                 ]
             ]
 
-            #html.div(class: "border-t antialised")[
-                #html.div(class: "p-5")[
-                    #if copyright [
-                        #html.span(class: "text-zinc-500 text-sm")[Made with #link("https:/github.com/l0uisgrange/manifesto")[Manifesto] from Typst Universe]
-                    ]
+            #html.div(class: "border-t p-5")[
+                #if copyright [
+                    #html.span(class: small-text-size)[Made with #link("https:/github.com/l0uisgrange/manifesto")[Manifesto] from Typst Universe]
                 ]
             ]
         ]
@@ -142,16 +155,16 @@
 /// -> content
 #let warning(content, title: "Warning", ..params) = block(
     ..params,
-    html.div(class: "px-3 py-2.5 rounded-md bg-orange-600/10", {
-        html.span(class: "flex items-center gap-2 not-prose", {
-            html.elem("svg", attrs: (class: "size-5", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 640 640"), html.elem(
+    html.div(class: "px-3 py-2.5 rounded-md bg-orange-600/10 mb-4", {
+        html.span(class: "flex items-center gap-2 *:m-0!", {
+            html.elem("svg", attrs: (class: "size-5", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24"), html.elem(
                 "path",
                 attrs: (
                     class: "fill-orange-600",
-                    d: "M256.5 37.6C265.8 29.8 279.5 30.1 288.4 38.5C300.7 50.1 311.7 62.9 322.3 75.9C335.8 92.4 352 114.2 367.6 140.1C372.8 133.3 377.6 127.3 381.8 122.2C382.9 120.9 384 119.5 385.1 118.1C393 108.3 402.8 96 415.9 96C429.3 96 438.7 107.9 446.7 118.1C448 119.8 449.3 121.4 450.6 122.9C460.9 135.3 474.6 153.2 488.3 175.3C515.5 219.2 543.9 281.7 543.9 351.9C543.9 475.6 443.6 575.9 319.9 575.9C196.2 575.9 96 475.7 96 352C96 260.9 137.1 182 176.5 127C196.4 99.3 216.2 77.1 231.1 61.9C239.3 53.5 247.6 45.2 256.6 37.7zM321.7 480C347 480 369.4 473 390.5 459C432.6 429.6 443.9 370.8 418.6 324.6C414.1 315.6 402.6 315 396.1 322.6L370.9 351.9C364.3 359.5 352.4 359.3 346.2 351.4C328.9 329.3 297.1 289 280.9 268.4C275.5 261.5 265.7 260.4 259.4 266.5C241.1 284.3 207.9 323.3 207.9 370.8C207.9 439.4 258.5 480 321.6 480z",
+                    d: "M10 2c0 -.88 1.056 -1.331 1.692 -.722c1.958 1.876 3.096 5.995 1.75 9.12l-.08 .174l.012 .003c.625 .133 1.203 -.43 2.303 -2.173l.14 -.224a1 1 0 0 1 1.582 -.153c1.334 1.435 2.601 4.377 2.601 6.27c0 4.265 -3.591 7.705 -8 7.705s-8 -3.44 -8 -7.706c0 -2.252 1.022 -4.716 2.632 -6.301l.605 -.589c.241 -.236 .434 -.43 .618 -.624c1.43 -1.512 2.145 -2.924 2.145 -4.78",
                 ),
             ))
-            html.span(class: "font-medium text-orange-600 *:p-0 !*:m-0", title)
+            html.span(class: "font-semibold text-orange-600", title)
         })
         content
     }),
@@ -164,16 +177,43 @@
 /// -> content
 #let tip(content, title: "Tip", ..params) = block(
     ..params,
-    html.div(class: "px-3 py-2.5 rounded-md bg-green-600/10", {
-        html.span(class: "flex items-center gap-2 not-prose", {
-            html.elem("svg", attrs: (class: "size-5", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 640 640"), html.elem(
+    html.div(class: "px-3 py-2.5 rounded-md bg-green-700/10 mb-4", {
+        html.span(class: "flex items-center gap-2 *:m-0!", {
+            html.elem("svg", attrs: (class: "size-5", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24"), {
+                html.elem("path", attrs: (class: "fill-green-700", d: "M4 11a1 1 0 0 1 .117 1.993l-.117 .007h-1a1 1 0 0 1 -.117 -1.993l.117 -.007h1z"))
+                html.elem("path", attrs: (class: "fill-green-700", d: "M12 2a1 1 0 0 1 .993 .883l.007 .117v1a1 1 0 0 1 -1.993 .117l-.007 -.117v-1a1 1 0 0 1 1 -1z"))
+                html.elem("path", attrs: (class: "fill-green-700", d: "M21 11a1 1 0 0 1 .117 1.993l-.117 .007h-1a1 1 0 0 1 -.117 -1.993l.117 -.007h1z"))
+                html.elem("path", attrs: (
+                    class: "fill-green-700",
+                    d: "M4.893 4.893a1 1 0 0 1 1.32 -.083l.094 .083l.7 .7a1 1 0 0 1 -1.32 1.497l-.094 -.083l-.7 -.7a1 1 0 0 1 0 -1.414z",
+                ))
+                html.elem("path", attrs: (class: "fill-green-700", d: "M17.693 4.893a1 1 0 0 1 1.497 1.32l-.083 .094l-.7 .7a1 1 0 0 1 -1.497 -1.32l.083 -.094l.7 -.7z"))
+                html.elem("path", attrs: (class: "fill-green-700", d: "M14 18a1 1 0 0 1 1 1a3 3 0 0 1 -6 0a1 1 0 0 1 .883 -.993l.117 -.007h4z"))
+                html.elem("path", attrs: (class: "fill-green-700", d: "M12 6a6 6 0 0 1 3.6 10.8a1 1 0 0 1 -.471 .192l-.129 .008h-6a1 1 0 0 1 -.6 -.2a6 6 0 0 1 3.6 -10.8z"))
+            })
+            html.span(class: "font-semibold text-green-700", title)
+        })
+        content
+    }),
+)
+
+/// Example (purple) notice with attached icon
+///
+/// - content (content): notice content
+/// - title (str): notice title, defaults to "Example"
+/// -> content
+#let example(content, title: "Example", ..params) = block(
+    ..params,
+    html.div(class: "px-3 py-2.5 rounded-md bg-purple-600/10 mb-4", {
+        html.span(class: "flex items-center gap-2 *:m-0!", {
+            html.elem("svg", attrs: (class: "size-5", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24"), html.elem(
                 "path",
                 attrs: (
-                    class: "fill-green-600",
-                    d: "M420.9 448C428.2 425.7 442.8 405.5 459.3 388.1C492 353.7 512 307.2 512 256C512 150 426 64 320 64C214 64 128 150 128 256C128 307.2 148 353.7 180.7 388.1C197.2 405.5 211.9 425.7 219.1 448L420.8 448zM416 496L224 496L224 512C224 556.2 259.8 592 304 592L336 592C380.2 592 416 556.2 416 512L416 496zM312 176C272.2 176 240 208.2 240 248C240 261.3 229.3 272 216 272C202.7 272 192 261.3 192 248C192 181.7 245.7 128 312 128C325.3 128 336 138.7 336 152C336 165.3 325.3 176 312 176z",
+                    class: "fill-purple-600",
+                    d: "M11.106 2.553a1 1 0 0 1 1.788 0l2.851 5.701l5.702 2.852a1 1 0 0 1 .11 1.725l-.11 .063l-5.702 2.851l-2.85 5.702a1 1 0 0 1 -1.726 .11l-.063 -.11l-2.852 -5.702l-5.701 -2.85a1 1 0 0 1 -.11 -1.726l.11 -.063l5.701 -2.852z",
                 ),
             ))
-            html.span(class: "font-medium text-green-600 *:p-0 !*:m-0", title)
+            html.span(class: "font-semibold text-purple-600", title)
         })
         content
     }),
@@ -186,17 +226,16 @@
 /// -> content
 #let info(content, title: "Info", ..params) = block(
     ..params,
-    html.div(class: "px-3 py-2.5 rounded-md bg-blue-600/10", {
-        html.span(class: "flex items-center gap-2 not-prose", {
-            html.elem("svg", attrs: (class: "size-5", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 640 640"), html.elem(
+    html.div(class: "px-3 py-2.5 rounded-md bg-blue-600/10 mb-4", {
+        html.span(class: "flex items-center gap-2 *:m-0!", {
+            html.elem("svg", attrs: (class: "size-5", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24"), html.elem(
                 "path",
                 attrs: (
                     class: "fill-blue-600",
-                    d: "M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM288 224C288 206.3 302.3 192 320 192C337.7 192 352 206.3 352 224C352 241.7 337.7 256 320 256C302.3 256 288 241.7 288 224zM280 288L328 288C341.3 288 352 298.7 352 312L352 400L360 400C373.3 400 384 410.7 384 424C384 437.3 373.3 448 360 448L280 448C266.7 448 256 437.3 256 424C256 410.7 266.7 400 280 400L304 400L304 336L280 336C266.7 336 256 325.3 256 312C256 298.7 266.7 288 280 288z",
+                    d: "M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm0 9h-1l-.117 .007a1 1 0 0 0 0 1.986l.117 .007v3l.007 .117a1 1 0 0 0 .876 .876l.117 .007h1l.117 -.007a1 1 0 0 0 .876 -.876l.007 -.117l-.007 -.117a1 1 0 0 0 -.764 -.857l-.112 -.02l-.117 -.006v-3l-.007 -.117a1 1 0 0 0 -.876 -.876l-.117 -.007zm.01 -3l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007z",
                 ),
-                [],
             ))
-            html.span(class: "font-medium text-blue-600 *:p-0 !*:m-0 ", title)
+            html.span(class: "font-semibold text-blue-600", title)
         })
         content
     }),
@@ -206,15 +245,27 @@
 ///
 /// - drawing (content): CeTZ canvas or any content
 /// - code (content): raw content (e.g. code) to display below the schema
+/// - leftnote (content): raw content (e.g. source text) to display left under the schema
+/// - rightnote (content): raw content (e.g. source text) to display right under the schema
 /// -> content
-#let schema(drawing, code: none, lang: "typst") = html.div(
-    class: "mb-7 rounded-md border dark:border-zinc-800 overflow-hidden flex-col flex *:m-0 *:block *:w-full *:even:rounded-t-none",
+#let schema(drawing, code: none, lang: "typst", leftnote: none, rightnote: none) = html.div(
+    class: "mb-7 rounded-md text-base border mb-4 flex-col flex *:m-0 *:block *:w-full *:even:rounded-t-none",
     {
-        html.div(class: "p-7 bg-white rounded-md dark:invert dark:hue-rotate-180" + if code != none { "rounded-b-none" } else { "" })[
+        html.div(class: "bg-white rounded-md overflow-x-auto p-7 *:mr-7" + if code != none or leftnote != none or rightnote != none { " rounded-b-none" } else { "" })[
             #html.frame(drawing)
         ]
+        if leftnote != none {
+            html.div(class: "schema-notes flex! justify-between flex-row items-center px-4 pb-3 rounded-md bg-white dark:text-black [&_a]:text-black!", {
+                if leftnote != none {
+                    html.div(leftnote)
+                }
+                if rightnote != none {
+                    html.div(class: "", rightnote)
+                }
+            })
+        }
         if code != none {
-            html.div(class: "*:rounded-t-none *:border-none border-t dark:border-zinc-800 *:border-none overflow-x-scroll", code)
+            html.div(class: "*:rounded-t-none *:border-none border-t *:m-0 dark:border-mist-800 *:border-none overflow-x-scroll", code)
         }
     },
 )
