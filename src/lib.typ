@@ -1,4 +1,4 @@
-#import "icons.typ": bulb-icon, flame-icon, flare-icon, spider-icon
+#import "icons.typ": bulb-icon, messages-icon, flare-icon, spider-icon
 
 /// Documentation template generation function
 ///
@@ -60,10 +60,11 @@
         #let small-text-size = if font == "sans" { "text-[0.88rem]" } else { "text-base" }
         #html.body(
             style: "font-family: '" + dfont + "', serif",
-            class: if font == "sans" { "[&_.schema-notes]:text-sm " } + "[&_*]:border-mist-200 [&_:is(h1,h2,h3,h4)]:font-semibold [&_:is(h1,h2,h3,h4)]:scroll-mt-5 [&_h2]:text-3xl [&_h3]:text-2xl [&_h3]:mt-6 [&_h2:nth-of-type(n+2)]:mt-10 [&_h2]:mb-4
-            [&_h3]:mb-3 [&_h4]:mb-3 [&_h4]:text-xl [&_p]:mb-3 [&_:is(ol,ul)]:ps-9 [&_ol_li::marker]:text-mist-500 [&_:is(ol,ul)]:space-y-3 [&_ol]:list-decimal [&_ul]:list-disc antialiased [&_a]:underline [&_a]:underline-offset-2 [&_a]:font-semibold text-mist-800
+            class: if font == "sans" { "[&_.schema-notes]:text-sm " } + "print:[zoom:0.8] print:bg-white [&_*]:border-mist-200 [&_:is(h1,h2,h3,h4,h5,h6)]:font-semibold [&_:is(h1,h2,h3,h4,h5,h6)]:scroll-mt-5 [&_h2]:text-3xl [&_h3]:text-2xl [&_h4]:text-lg [&_h3]:mt-6 [&_h2:nth-of-type(n+2)]:mt-10 [&_h2]:mb-4
+            [&_:is(h3,h4)]:mb-3 [&_:is(h5,h6)]:mb-4 [&_h4]:text-xl [&_p]:mb-3 [&_:is(ol,ul)]:ps-9 [&_ol_li::marker]:text-mist-500 [&_:is(ol,ul)]:space-y-3 [&_ol]:list-decimal [&_ul]:list-disc antialiased [&_a]:underline [&_a]:underline-offset-2 [&_a]:font-semibold text-mist-800
             dark:text-mist-300 [&_strong]:text-black [&_strong]:font-semibold [&_:is(strong,a)]:dark:text-white! dark:text-white bg-mist-50 dark:bg-mist-950 [&_*]:dark:border-mist-800
-            [&_td]:py-1.5 [&_td]:border-b [&_td]:px-2 [&_td]:py-1 [&_td:first-child]:pl-0 [&_td:last-child]:pr-0 [&_tr:last-child_td]:border-none [&_tr:first-child_td]:pt-0 [&_tr:last-child_td]:pb-0"
+            [&_td]:py-1.5 [&_thead+tbody_tr:first-child_td]:pt-1.5 [&_th]:pb-2 [&_:is(td,th)]:border-b [&_:is(td,th)]:px-2 [&_td]:py-1 [&_:is(td,th):first-child]:pl-0 [&_td:last-child]:pr-0 [&_tr:last-child_td]:border-none [&_tr:first-child_td]:pt-0 [&_tr:last-child_td]:pb-0
+            [&_td:has(.typst-frame)]:py-3!"
                 + class,
         )[
             // Configuration
@@ -76,9 +77,9 @@
                 html.div(class: "mb-4 p-4 border bg-mist-100/30 dark:bg-mist-900/20 dark:border-mist-800 text-[.85rem] rounded-md", it)
             }
             // Article
-            #html.main(class: "max-w-[95rem] mx-auto grid lg:grid-cols-[max-content_auto_max-content] relative gap-8 p-5")[
+            #html.main(class: "max-w-[95rem] mx-auto grid lg:grid-cols-[max-content_auto_max-content] print:grid-cols-1 relative gap-8 p-5")[
                 // Navigation
-                #html.div(class: "order-1 md:w-64 overflow-visible")[
+                #html.div(class: "order-1 md:w-64 overflow-visible print:hidden")[
                     #html.div(class: "sticky top-5 " + text-size + " [&_table]:my-6 [&_table]:w-full dark:text-white [&_table]:" + small-text-size)[
                         #html.h1(
                             class: if version != none { "rounded-bl-none " } else { "" }
@@ -108,7 +109,7 @@
                         #html.div(class: "grid grid-cols-2 *:flex *:items-start gap-x-3 gap-y-5 *:gap-2 [&_p]:m-0! text-mist-800 dark:text-mist-200 lg:grid-cols-1 mt-8")[
                             #if "qa" in notices [
                                 #html.div[
-                                    #flame-icon
+                                    #messages-icon
                                     #html.div(class: small-text-size)[
                                         Got a question? \
                                         Ask it on the #link(notices.qa)[community forum].
@@ -128,18 +129,55 @@
                     ]
                 ]
                 #html.article(
-                    class: "order-3 md:order-2 " + text-size + " flex-auto overflow-hidden",
+                    class: "order-3 md:order-2 " + text-size + " flex-auto overflow-hidden [&_table]:w-full [&_th]:text-left",
                     doc,
                 )
-                #html.div(class: "order-2 " + text-size + "! md:order-3 md:w-64 flex-none overflow-visible")[
+                #html.div(class: "order-2 print:hidden " + text-size + "! md:order-3 md:w-64 flex-none")[
                     #html.div(
-                        class: "sticky top-5 dark:text-white mb-12 *:space-y-0 [&_ol]:p-0 [&_li]:m-0 [&_a]:font-normal! [&_a]:text-current! [&_a]:hover:text-black! [&_a]:dark:hover:text-white! [&_a]:no-underline!",
-                        outline(depth: 1, title: none),
-                    )
+                        class: "sticky top-5 max-h-[calc(100vh-2.5rem)] overflow-y-auto dark:text-white lg:mb-12 *:space-y-0 [&_a]:font-normal! [&_a]:text-current! [&_a]:hover:text-black! [&_a]:dark:hover:text-white! [&_a]:no-underline!",
+                    )[
+                        #context {
+                            let headings = query(heading.where(outlined: true))
+                            let sections = ()
+                            let current-section = none
+                            for h in headings {
+                                if h.depth == 1 {
+                                    if current-section != none {
+                                        sections.push(current-section)
+                                    }
+                                    current-section = (heading: h, children: ())
+                                } else if current-section != none {
+                                    current-section.children.push(h)
+                                }
+                            }
+                            if current-section != none {
+                                sections.push(current-section)
+                            }
+                            html.nav(class: "flex flex-col gap-2 [&_p]:m-0!", for (i, section) in sections.enumerate() {
+                                if section.children.len() == 0 {
+                                    link(section.heading.location(), section.heading.body)
+                                } else {
+                                    html.details(name: "outline-accordion", class: "group [&_a]:block", {
+                                        html.elem(
+                                            "summary",
+                                            attrs: (class: "cursor-pointer list-none flex items-center justify-between [&::-webkit-details-marker]:hidden"),
+                                            {
+                                                link(section.heading.location(), section.heading.body)
+                                                html.elem("svg", attrs: (class: "size-5 transition-transform group-open:rotate-90 shrink-0 opacity-50", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke-width: "1.6", stroke-linecap: "round", stroke-linejoin: "round"))[#html.elem("path", attrs: (stroke: "none", fill: "none", d: "M0 0h24v24H0z")) #html.elem("path", attrs: (d: "M9 6l6 6l-6 6"))]
+                                            },
+                                        )
+                                        html.div(class: "pl-4 border-l border-mist-200 dark:border-mist-700 ml-1 mb-1", for child in section.children {
+                                            html.div(class: if child.depth >= 3 { "ps-4" } else { "" }, link(child.location(), child.body))
+                                        })
+                                    })
+                                }
+                            })
+                        }
+                    ]
                 ]
             ]
 
-            #html.div(class: "border-t p-5")[
+            #html.div(class: "border-t p-5 print:hidden")[
                 #if copyright [
                     #html.span(class: small-text-size)[Made with #link("https:/github.com/l0uisgrange/manifesto")[Manifesto] from Typst Universe]
                 ]
@@ -251,7 +289,7 @@
 #let schema(drawing, code: none, lang: "typst", leftnote: none, rightnote: none) = html.div(
     class: "mb-7 rounded-md text-base border mb-4 flex-col flex *:m-0 *:block *:w-full *:even:rounded-t-none",
     {
-        html.div(class: "bg-white rounded-md overflow-x-auto p-7 *:mr-7" + if code != none or leftnote != none or rightnote != none { " rounded-b-none" } else { "" })[
+        html.div(class: "bg-white rounded-md overflow-x-auto print:p-4 p-7 *:mr-7" + if code != none or leftnote != none or rightnote != none { " rounded-b-none" } else { "" })[
             #html.frame(drawing)
         ]
         if leftnote != none {
