@@ -6,7 +6,7 @@
 
 You are free to check either [this example](https://bone.grangelouis.ch) from `bone` or [this one](https://zap.grangelouis.ch) from `zap`.
 
-<img width="1452" height="922" alt="Capture d’écran 2026-03-09 à 22 24 10" src="https://github.com/user-attachments/assets/9e388dc2-267a-4131-a63b-79a052bf9b85" />
+<img width="1452" height="922" alt="Preview example" src="https://github.com/user-attachments/assets/9e388dc2-267a-4131-a63b-79a052bf9b85" />
 
 ## Quick usage
 
@@ -15,7 +15,7 @@ The template is very easy to use, and will transform your whole project into a s
 ```typst
 #import "@preview/manifesto:0.1.1": template
 
-#show: it => template(it, title: "MyPackage", toml: toml("/typst.toml"))
+#show: it => template(it, toml: toml("/typst.toml"))
 
 = My first title
 
@@ -28,7 +28,7 @@ The `template` function accepts a few parameters to customize the data displayed
 
 | Option | Default value | Description |
 | --- | --- | --- |
-| `name` (required) |  | The name of your package |
+| `name` |  | The name of your package |
 | `toml` | `none` | The path to the `typst.toml` file |
 | `version` | `none` | Your package version |
 | `description` | `none` | Your package description |
