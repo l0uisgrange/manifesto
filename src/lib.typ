@@ -189,7 +189,7 @@
 
             #html.div(class: "border-t p-5 print:hidden")[
                 #if copyright [
-                    #html.span(class: small-text-size)[Made with #link("https:/github.com/l0uisgrange/manifesto")[Manifesto] from Typst Universe]
+                    #html.span(class: small-text-size)[Made with #link("https://github.com/l0uisgrange/manifesto")[Manifesto] from Typst Universe]
                 ]
             ]
         ]
