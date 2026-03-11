@@ -156,7 +156,7 @@
                             }
                             html.nav(class: "flex flex-col gap-2 [&_p]:m-0!", for (i, section) in sections.enumerate() {
                                 if section.children.len() == 0 {
-                                    link(section.heading.location(), section.heading.body)
+                                    html.div(link(section.heading.location(), section.heading.body))
                                 } else {
                                     html.details(name: "outline-accordion", class: "group [&_a]:block", {
                                         html.elem(
