@@ -1,7 +1,7 @@
 #let flame-icon = html.elem(
     "svg",
     attrs: (
-        class: "fill-mist-600 size-5 dark:fill-mist-400",
+        class: "flex-none fill-mist-600 size-5 dark:fill-mist-400",
         xmlns: "http://www.w3.org/2000/svg",
         viewBox: "0 0 24 24",
     ),
@@ -16,7 +16,7 @@
 #let spider-icon = html.elem(
     "svg",
     attrs: (
-        class: "fill-mist-600 size-5 dark:fill-mist-400",
+        class: "flex-none fill-mist-600 size-5 dark:fill-mist-400",
         xmlns: "http://www.w3.org/2000/svg",
         viewBox: "0 0 24 24",
     ),
@@ -31,7 +31,7 @@
 #let messages-icon = html.elem(
     "svg",
     attrs: (
-        class: "fill-mist-600 size-5 dark:fill-mist-400",
+        class: "flex-none fill-mist-600 size-5 dark:fill-mist-400",
         xmlns: "http://www.w3.org/2000/svg",
         viewBox: "0 0 24 24",
     ),
@@ -61,7 +61,7 @@
 #let bulb-icon = html.elem(
     "svg",
     attrs: (
-        class: "fill-mist-600 size-5 dark:fill-mist-400",
+        class: "flex-none fill-mist-600 size-5 dark:fill-mist-400",
         xmlns: "http://www.w3.org/2000/svg",
         viewBox: "0 0 24 24",
     ),
@@ -78,7 +78,7 @@
 #let flare-icon = html.elem(
     "svg",
     attrs: (
-        class: "fill-mist-600 size-5 dark:fill-mist-400",
+        class: "flex-none fill-mist-600 size-5 dark:fill-mist-400",
         xmlns: "http://www.w3.org/2000/svg",
         viewBox: "0 0 24 24",
     ),
